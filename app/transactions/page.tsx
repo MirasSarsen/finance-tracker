@@ -113,6 +113,7 @@ export default async function TransactionsPage() {
                   <ul className="activity-list history-activity-list">
                     {dayTransactions.map((transaction) => (
                       <li className="activity-item" key={transaction.id}>
+                        <Link className="history-row-link" href={`/transactions/${transaction.id}`} aria-label={`Открыть операцию: ${transaction.categoryName}`}>
                         <span className={`activity-category-icon ${transaction.type === "INCOME" ? "income" : "expense"}`} aria-hidden="true">
                           {transaction.categoryIcon ?? (transaction.type === "INCOME" ? "＋" : "−")}
                         </span>
@@ -128,6 +129,7 @@ export default async function TransactionsPage() {
                           </span>
                           <span className="activity-time">{timeFormatter.format(transaction.occurredAt)}</span>
                         </span>
+                        </Link>
                       </li>
                     ))}
                   </ul>
