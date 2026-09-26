@@ -1,69 +1,106 @@
-import Image from "next/image";
+import { eq } from "drizzle-orm";
+import { headers } from "next/headers";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+import { SignOutButton } from "@/components/sign-out-button";
+import { db } from "@/db";
+import { accounts, categories } from "@/db/schema";
+import { auth } from "@/lib/auth";
+
+export default async function Home() {
+  const session = await auth.api.getSession({ headers: await headers() });
+
+  if (!session) {
+    redirect("/login");
+  }
+
+  const [account] = await db
+    .select({ name: accounts.name })
+    .from(accounts)
+    .where(eq(accounts.userId, session.user.id))
+    .limit(1);
+
+  const userCategories = await db
+    .select({ name: categories.name, type: categories.type, icon: categories.icon })
+    .from(categories)
+    .where(eq(categories.userId, session.user.id));
+
+  const expenseCategoryCount = userCategories.filter((item) => item.type === "EXPENSE").length;
+  const incomeCategoryCount = userCategories.filter((item) => item.type === "INCOME").length;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main className="dashboard-page">
+      <div className="dashboard-shell">
+        <header className="dashboard-header">
+          <Link className="dashboard-brand" href="/" aria-label="Flow — главная">
+            <span className="brand-mark" aria-hidden="true">f</span>
+            <span>flow</span>
+          </Link>
+          <div className="profile-chip">
+            <span className="profile-avatar" aria-hidden="true">
+              {session.user.name.trim().charAt(0).toLocaleUpperCase("ru-RU")}
+            </span>
+            <span className="profile-name">{session.user.name}</span>
+            <SignOutButton />
+          </div>
+        </header>
+
+        <section className="welcome-block">
+          <p className="eyebrow">ТВОЁ ФИНАНСОВОЕ ПРОСТРАНСТВО</p>
+          <h1>Привет, {session.user.name.split(" ")[0]}.</h1>
+          <p>Спокойный контроль над деньгами начинается с маленьких шагов.</p>
+        </section>
+
+        <section className="balance-card" aria-labelledby="balance-heading">
+          <div className="balance-card-top">
+            <div>
+              <p className="balance-label" id="balance-heading">Общий баланс</p>
+              <p className="balance-amount">0 <span>₸</span></p>
+            </div>
+            <span className="balance-icon" aria-hidden="true">↗</span>
+          </div>
+          <div className="balance-card-bottom">
+            <span>{account?.name ?? "Счёт не найден"}</span>
+            <span>Валюта счёта · KZT</span>
+          </div>
+        </section>
+
+        <section className="dashboard-grid" aria-label="Сводка финансов">
+          <article className="summary-card">
+            <div className="summary-icon income-icon" aria-hidden="true">↓</div>
+            <p className="summary-label">Доходы за неделю</p>
+            <p className="summary-value">0 ₸</p>
+            <p className="summary-caption">Пока нет операций</p>
+          </article>
+          <article className="summary-card">
+            <div className="summary-icon expense-icon" aria-hidden="true">↑</div>
+            <p className="summary-label">Расходы за неделю</p>
+            <p className="summary-value">0 ₸</p>
+            <p className="summary-caption">Пока нет операций</p>
+          </article>
+        </section>
+
+        <section className="activity-card">
+          <div className="section-heading">
+            <div>
+              <p className="eyebrow">ПОСЛЕДНИЕ ДВИЖЕНИЯ</p>
+              <h2>История операций</h2>
+            </div>
+            <span className="activity-count">0 операций</span>
+          </div>
+          <div className="empty-activity">
+            <div className="empty-orb" aria-hidden="true"><span>₸</span></div>
+            <h3>Здесь появятся твои операции</h3>
+            <p>Счёт и категории готовы. Добавь первую операцию, чтобы увидеть историю и баланс.</p>
+          </div>
+        </section>
+
+        <footer className="dashboard-footer">
+          <span>Счёт: {account ? "готов" : "нужно настроить"}</span>
+          <span>{expenseCategoryCount} категорий расходов · {incomeCategoryCount} категорий доходов</span>
+        </footer>
+      </div>
+    </main>
   );
 }

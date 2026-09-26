@@ -6,8 +6,8 @@ A mobile-first personal finance tracker built with Next.js, TypeScript, PostgreS
 
 1. Install dependencies with `npm install`.
 2. Copy `.env.example` to `.env`.
-3. Start PostgreSQL with `docker compose up -d`.
-4. Generate a migration with `npm run db:generate`.
+3. Set a private `BETTER_AUTH_SECRET` value in `.env` (at least 32 characters).
+4. Start PostgreSQL with `docker compose up -d`.
 5. Apply migrations with `npm run db:migrate`.
 6. Start the app with `npm run dev`.
 

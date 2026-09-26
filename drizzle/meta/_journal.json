@@ -8,6 +8,13 @@
       "when": 1790405797909,
       "tag": "0000_unique_finance_tracker",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790413476173,
+      "tag": "0001_worthless_thunderbolts",
+      "breakpoints": true
     }
   ]
 }
