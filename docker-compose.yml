@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: finance_tracker
       POSTGRES_PASSWORD: finance_tracker
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - finance_tracker_data:/var/lib/postgresql/data
 
