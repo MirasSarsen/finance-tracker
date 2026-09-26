@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: finance_tracker
+      POSTGRES_USER: finance_tracker
+      POSTGRES_PASSWORD: finance_tracker
+    ports:
+      - "5432:5432"
+    volumes:
+      - finance_tracker_data:/var/lib/postgresql/data
+
+volumes:
+  finance_tracker_data:
