@@ -1,10 +1,11 @@
-import { and, count, desc, eq, gte, sql } from "drizzle-orm";
+import { and, count, desc, eq, gte, lt, sql } from "drizzle-orm";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { SignOutButton } from "@/components/sign-out-button";
 import { TransactionForm } from "@/components/transaction-form";
+import { WeeklyAnalytics } from "@/components/weekly-analytics";
 import { db } from "@/db";
 import { accounts, categories, transactions } from "@/db/schema";
 import { auth } from "@/lib/auth";
@@ -17,13 +18,35 @@ function formatKzt(amount: string | number) {
   }).format(Number(amount));
 }
 
-function getUtcWeekStart() {
-  const now = new Date();
-  const todayUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
-  const weekday = new Date(todayUtc).getUTCDay();
+function getLocalWeekStart(date: Date) {
+  const formatted = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Qyzylorda", year: "numeric", month: "2-digit", day: "2-digit",
+  }).formatToParts(date);
+  const parts = Object.fromEntries(formatted.map(({ type, value }) => [type, value]));
+  const [year, month, day] = [Number(parts.year), Number(parts.month), Number(parts.day)];
+  const weekday = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
   const mondayOffset = (weekday + 6) % 7;
 
-  return new Date(todayUtc - mondayOffset * 24 * 60 * 60 * 1000);
+  // Qyzylorda is UTC+5, so local Monday at midnight starts at 19:00 UTC Sunday.
+  return new Date(Date.UTC(year, month - 1, day - mondayOffset) - 5 * 60 * 60 * 1000);
+}
+
+function getWeekDays(weekStart: Date) {
+  const dateFormatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Qyzylorda", year: "numeric", month: "2-digit", day: "2-digit",
+  });
+  const labelFormatter = new Intl.DateTimeFormat("ru-RU", {
+    timeZone: "Asia/Qyzylorda", weekday: "short",
+  });
+
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(weekStart.getTime() + 12 * 60 * 60 * 1000 + index * 24 * 60 * 60 * 1000);
+    const parts = Object.fromEntries(dateFormatter.formatToParts(date).map(({ type, value }) => [type, value]));
+    return {
+      key: `${parts.year}-${parts.month}-${parts.day}`,
+      label: labelFormatter.format(date).replace(".", ""),
+    };
+  });
 }
 
 export default async function Home() {
@@ -34,13 +57,22 @@ export default async function Home() {
   }
 
   const userId = session.user.id;
-  const weekStart = getUtcWeekStart();
+  const now = new Date();
+  const weekStart = getLocalWeekStart(now);
+  const previousWeekStart = new Date(weekStart.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const previousPeriodEnd = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const weekDays = getWeekDays(weekStart);
+  const localDay = sql<string>`to_char(${transactions.occurredAt} at time zone 'Asia/Qyzylorda', 'YYYY-MM-DD')`;
+  const categoryExpenseTotal = sql<string>`coalesce(sum(${transactions.amount}), 0)`;
 
   const [
     [account],
     userCategories,
     [balanceResult],
     [weeklyTotals],
+    [previousWeeklyTotals],
+    dailyExpenses,
+    categoryExpenses,
     recentTransactions,
     [transactionCount],
   ] = await Promise.all([
@@ -65,7 +97,34 @@ export default async function Home() {
         expense: sql<string>`coalesce(sum(case when ${transactions.type} = 'EXPENSE' then ${transactions.amount} else 0 end), 0)`,
       })
       .from(transactions)
-      .where(and(eq(transactions.userId, userId), gte(transactions.occurredAt, weekStart))),
+      .where(and(eq(transactions.userId, userId), gte(transactions.occurredAt, weekStart), lt(transactions.occurredAt, now))),
+    db
+      .select({
+        income: sql<string>`coalesce(sum(case when ${transactions.type} = 'INCOME' then ${transactions.amount} else 0 end), 0)`,
+        expense: sql<string>`coalesce(sum(case when ${transactions.type} = 'EXPENSE' then ${transactions.amount} else 0 end), 0)`,
+      })
+      .from(transactions)
+      .where(and(eq(transactions.userId, userId), gte(transactions.occurredAt, previousWeekStart), lt(transactions.occurredAt, previousPeriodEnd))),
+    db
+      .select({ type: transactions.type, day: localDay, amount: sql<string>`coalesce(sum(${transactions.amount}), 0)` })
+      .from(transactions)
+      .where(and(
+        eq(transactions.userId, userId),
+        gte(transactions.occurredAt, weekStart),
+        lt(transactions.occurredAt, now),
+      ))
+      .groupBy(transactions.type, localDay),
+    db
+      .select({ id: categories.id, type: transactions.type, name: categories.name, icon: categories.icon, amount: categoryExpenseTotal })
+      .from(transactions)
+      .innerJoin(categories, eq(transactions.categoryId, categories.id))
+      .where(and(
+        eq(transactions.userId, userId),
+        gte(transactions.occurredAt, weekStart),
+        lt(transactions.occurredAt, now),
+      ))
+      .groupBy(categories.id, categories.name, categories.icon, transactions.type)
+      .orderBy(desc(categoryExpenseTotal)),
     db
       .select({
         id: transactions.id,
@@ -89,6 +148,8 @@ export default async function Home() {
   const balance = balanceResult?.amount ?? "0";
   const incomeThisWeek = weeklyTotals?.income ?? "0";
   const expenseThisWeek = weeklyTotals?.expense ?? "0";
+  const incomePreviousPeriod = previousWeeklyTotals?.income ?? "0";
+  const expensePreviousPeriod = previousWeeklyTotals?.expense ?? "0";
   const dateFormatter = new Intl.DateTimeFormat("ru-RU", {
     day: "numeric",
     month: "short",
@@ -137,20 +198,15 @@ export default async function Home() {
           <TransactionForm categories={userCategories} />
         </section>
 
-        <section className="dashboard-grid" aria-label="Сводка финансов за неделю">
-          <article className="summary-card">
-            <div className="summary-icon income-icon" aria-hidden="true">↓</div>
-            <p className="summary-label">Доходы за неделю</p>
-            <p className="summary-value">{formatKzt(incomeThisWeek)}</p>
-            <p className="summary-caption">Понедельник — сегодня</p>
-          </article>
-          <article className="summary-card">
-            <div className="summary-icon expense-icon" aria-hidden="true">↑</div>
-            <p className="summary-label">Расходы за неделю</p>
-            <p className="summary-value">{formatKzt(expenseThisWeek)}</p>
-            <p className="summary-caption">Понедельник — сегодня</p>
-          </article>
-        </section>
+        <WeeklyAnalytics
+          income={incomeThisWeek}
+          expense={expenseThisWeek}
+          previousIncome={incomePreviousPeriod}
+          previousExpense={expensePreviousPeriod}
+          dailyTotals={dailyExpenses}
+          categoryTotals={categoryExpenses}
+          weekDays={weekDays}
+        />
 
         <section className="activity-card">
           <div className="section-heading">

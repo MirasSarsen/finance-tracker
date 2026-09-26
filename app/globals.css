@@ -225,6 +225,38 @@ button { cursor: pointer; }
 .summary-label { margin: 15px 0 6px; color: #6f7a73; font-size: 11px; }
 .summary-value { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: -.7px; }
 .summary-caption { margin: 7px 0 0; color: #9aa39d; font-size: 10px; }
+.analytics-section { display: grid; gap: 13px; margin-top: 15px; }
+.analytics-heading, .analytics-card-heading { display: flex; align-items: end; justify-content: space-between; gap: 12px; }
+.analytics-heading h2 { margin: 7px 0 0; font-size: 19px; letter-spacing: -.5px; }
+.analytics-heading > span, .analytics-card-heading > span { color: #87928a; font-size: 10px; text-align: right; }
+.analytics-type-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border: 1px solid #e5ebe5; border-radius: 12px; background: #edf1ec; }
+.analytics-type-switch button { min-height: 37px; padding: 0 12px; border: 0; border-radius: 9px; background: transparent; color: #738078; font-size: 11px; font-weight: 700; }
+.analytics-type-switch button.active.expense { background: #fff; color: #ad6048; box-shadow: 0 2px 8px #3522180d; }
+.analytics-type-switch button.active.income { background: #fff; color: #26734c; box-shadow: 0 2px 8px #1738220d; }
+.analytics-summary { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); margin-top: 0; }
+.analytics-period-note { align-self: center; margin: 0; color: #87928a; font-size: 11px; line-height: 1.5; }
+.analytics-change { margin: 8px 0 0; font-size: 10px; }
+.income-change { color: #26734c; }
+.expense-change { color: #ad6048; }
+.analytics-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: 13px; }
+.analytics-card { min-width: 0; padding: 20px; border: 1px solid #e5ebe5; border-radius: 17px; background: var(--surface); }
+.analytics-card-heading { align-items: center; }
+.analytics-card-heading h3 { margin: 6px 0 0; font-size: 15px; }
+.weekly-chart { display: grid; height: 190px; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 9px; margin-top: 18px; }
+.weekly-chart-day { display: grid; min-width: 0; grid-template-rows: 20px 1fr 17px; gap: 6px; text-align: center; }
+.weekly-chart-amount { overflow: hidden; color: #87928a; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.weekly-chart-track { display: flex; min-height: 0; align-items: end; justify-content: center; overflow: hidden; border-radius: 8px 8px 3px 3px; background: #f1f5f1; }
+.weekly-chart-bar { width: min(28px, 65%); min-height: 0; border-radius: 7px 7px 2px 2px; background: linear-gradient(180deg, #59a779, #1b6b4b); transition: height 180ms ease; }
+.weekly-chart-bar.expense { background: linear-gradient(180deg, #d89b85, #ad6048); }
+.weekly-chart-label { color: #7b8780; font-size: 10px; text-transform: capitalize; }
+.category-expense-list { display: grid; gap: 16px; margin: 20px 0 0; padding: 0; list-style: none; }
+.category-expense-topline { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 7px; font-size: 11px; }
+.category-expense-name { overflow: hidden; color: #48564d; text-overflow: ellipsis; white-space: nowrap; }
+.category-expense-amount { flex: 0 0 auto; color: #334139; font-weight: 700; }
+.category-expense-track { height: 6px; overflow: hidden; border-radius: 99px; background: #f1f3f0; }
+.category-expense-track > span { display: block; height: 100%; border-radius: inherit; background: #78a987; }
+.category-expense-track > span.expense { background: #d89b85; }
+.analytics-empty { margin: 24px 0; color: #8a958e; font-size: 12px; }
 
 .activity-card { margin-top: 15px; padding: 22px 24px 5px; border: 1px solid #e5ebe5; border-radius: 18px; background: var(--surface); }
 .section-heading { display: flex; align-items: center; justify-content: space-between; }
@@ -291,6 +323,15 @@ button { cursor: pointer; }
   .welcome-block { padding-top: 32px; }
   .balance-card { padding: 21px 20px 16px; border-radius: 17px; }
   .dashboard-grid { gap: 10px; margin-top: 10px; }
+  .analytics-section { margin-top: 10px; }
+  .analytics-heading { align-items: flex-start; flex-direction: column; gap: 7px; }
+  .analytics-type-switch { width: 100%; }
+  .analytics-summary { grid-template-columns: 1fr; }
+  .analytics-period-note { padding: 0 3px 2px; }
+  .analytics-grid { grid-template-columns: 1fr; gap: 10px; }
+  .analytics-card { padding: 17px; }
+  .weekly-chart { gap: 5px; }
+  .weekly-chart-amount { font-size: 8px; }
   .summary-card { padding: 14px; }
   .summary-value { font-size: 19px; }
   .transaction-form { gap: 14px; padding: 18px; }
