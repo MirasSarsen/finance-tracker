@@ -158,7 +158,10 @@ export default async function Home() {
               <p className="eyebrow">ПОСЛЕДНИЕ ДВИЖЕНИЯ</p>
               <h2>История операций</h2>
             </div>
-            <span className="activity-count">{transactionCount?.total ?? 0} операций</span>
+            <div className="activity-actions">
+              <span className="activity-count">{transactionCount?.total ?? 0} операций</span>
+              <Link className="history-link" href="/transactions">Вся история <span aria-hidden="true">→</span></Link>
+            </div>
           </div>
           {recentTransactions.length > 0 ? (
             <ul className="activity-list">
@@ -182,8 +185,7 @@ export default async function Home() {
           ) : (
             <div className="empty-activity">
               <div className="empty-orb" aria-hidden="true"><span>₸</span></div>
-              <h3>Здесь появятся твои операции</h3>
-              <p>Счёт и категории готовы. Добавь первую операцию, чтобы увидеть историю и баланс.</p>
+              <p>Добавь первую операцию, чтобы увидеть историю и баланс.</p>
             </div>
           )}
         </section>

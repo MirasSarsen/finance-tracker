@@ -229,7 +229,10 @@ button { cursor: pointer; }
 .activity-card { margin-top: 15px; padding: 22px 24px 5px; border: 1px solid #e5ebe5; border-radius: 18px; background: var(--surface); }
 .section-heading { display: flex; align-items: center; justify-content: space-between; }
 .section-heading h2 { margin: 7px 0 0; font-size: 18px; letter-spacing: -.5px; }
+.activity-actions { display: flex; align-items: center; gap: 14px; }
 .activity-count { color: #87928a; font-size: 10px; }
+.history-link, .history-back-link { color: var(--green); font-size: 11px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.history-link:hover, .history-back-link:hover { text-decoration: underline; }
 .activity-list { margin: 14px 0 0; padding: 0; list-style: none; }
 .activity-item { display: flex; min-width: 0; align-items: center; gap: 12px; padding: 14px 0; border-top: 1px solid #edf0ed; }
 .activity-category-icon { display: grid; width: 40px; height: 40px; flex: 0 0 auto; place-items: center; border-radius: 13px; background: #f1f5f1; font-size: 17px; }
@@ -241,6 +244,19 @@ button { cursor: pointer; }
 .activity-amount { flex: 0 0 auto; font-size: 13px; font-weight: 700; }
 .activity-amount.income { color: #26734c; }
 .activity-amount.expense { color: #ad6048; }
+.activity-amount-block { display: grid; flex: 0 0 auto; justify-items: end; gap: 4px; }
+.activity-time { color: #9aa39d; font-size: 10px; }
+.history-page-heading { padding: 40px 0 18px; }
+.history-page-heading h1 { margin: 9px 0 5px; font-size: clamp(27px, 4vw, 36px); letter-spacing: -1.5px; }
+.history-page-heading > p:last-child { margin: 0; color: var(--muted); font-size: 13px; }
+.history-groups { display: grid; gap: 18px; }
+.history-day { padding: 18px 22px 4px; border: 1px solid #e5ebe5; border-radius: 18px; background: var(--surface); }
+.history-day-title { margin: 0; color: #68766d; font-size: 12px; font-weight: 700; }
+.history-activity-list { margin-top: 10px; }
+.history-empty-card { display: grid; min-height: 300px; justify-items: center; align-content: center; gap: 10px; padding: 28px; border: 1px solid #e5ebe5; border-radius: 18px; background: var(--surface); text-align: center; }
+.history-empty-card h2 { margin: 4px 0 0; font-size: 17px; }
+.history-empty-card p { max-width: 300px; margin: 0; color: #8a958e; font-size: 12px; line-height: 1.6; }
+.history-empty-link { min-height: 43px; margin-top: 8px; padding: 0 18px; }
 .empty-activity { display: flex; min-height: 238px; flex-direction: column; align-items: center; justify-content: center; padding: 25px 12px; text-align: center; }
 .empty-orb { display: grid; width: 56px; height: 56px; place-items: center; border: 1px solid #e2ece4; border-radius: 18px; background: #f3f8f3; color: #548168; font-size: 22px; font-weight: 650; }
 .empty-activity h3 { margin: 16px 0 6px; font-size: 14px; }
@@ -266,5 +282,8 @@ button { cursor: pointer; }
   .summary-value { font-size: 19px; }
   .transaction-form { gap: 14px; padding: 18px; }
   .activity-card { margin-top: 10px; padding: 19px 17px 4px; }
+  .activity-actions { align-items: flex-end; flex-direction: column; gap: 5px; }
+  .history-day { padding: 16px 16px 3px; }
+  .history-page-heading { padding-top: 32px; }
   .dashboard-footer { flex-direction: column; }
 }
