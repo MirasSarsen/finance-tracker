@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { SignOutButton } from "@/components/sign-out-button";
 import { BottomNavigation } from "@/components/bottom-navigation";
+import { DashboardTransactionsProvider, RecentTransactions } from "@/components/dashboard-transactions";
 import { TransactionForm } from "@/components/transaction-form";
 import { WeeklyAnalytics } from "@/components/weekly-analytics";
 import { db } from "@/db";
@@ -160,13 +161,6 @@ export default async function Home() {
   const expenseThisWeek = weeklyTotals?.expense ?? "0";
   const incomePreviousPeriod = previousWeeklyTotals?.income ?? "0";
   const expensePreviousPeriod = previousWeeklyTotals?.expense ?? "0";
-  const dateFormatter = new Intl.DateTimeFormat("ru-RU", {
-    day: "numeric",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
   return (
     <main className="dashboard-page">
       <div className="dashboard-shell">
@@ -204,57 +198,26 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="transaction-section" id="transaction-form" aria-label="Добавить операцию">
-          <TransactionForm categories={userCategories} accounts={userAccounts} today={getLocalDateKey(now)} />
-        </section>
+        <DashboardTransactionsProvider
+          initialTransactions={recentTransactions}
+          transactionCount={transactionCount?.total ?? 0}
+        >
+          <section className="transaction-section" id="transaction-form" aria-label="Добавить операцию">
+            <TransactionForm categories={userCategories} accounts={userAccounts} today={getLocalDateKey(now)} />
+          </section>
 
-        <WeeklyAnalytics
-          income={incomeThisWeek}
-          expense={expenseThisWeek}
-          previousIncome={incomePreviousPeriod}
-          previousExpense={expensePreviousPeriod}
-          dailyTotals={dailyExpenses}
-          categoryTotals={categoryExpenses}
-          weekDays={weekDays}
-        />
+          <WeeklyAnalytics
+            income={incomeThisWeek}
+            expense={expenseThisWeek}
+            previousIncome={incomePreviousPeriod}
+            previousExpense={expensePreviousPeriod}
+            dailyTotals={dailyExpenses}
+            categoryTotals={categoryExpenses}
+            weekDays={weekDays}
+          />
 
-        <section className="activity-card">
-          <div className="section-heading">
-            <div>
-              <p className="eyebrow">ПОСЛЕДНИЕ ДВИЖЕНИЯ</p>
-              <h2>История операций</h2>
-            </div>
-            <div className="activity-actions">
-              <span className="activity-count">{transactionCount?.total ?? 0} операций</span>
-              <Link className="history-link" href="/transactions">Вся история <span aria-hidden="true">→</span></Link>
-            </div>
-          </div>
-          {recentTransactions.length > 0 ? (
-            <ul className="activity-list">
-              {recentTransactions.map((transaction) => (
-                <li className="activity-item" key={transaction.id}>
-                  <span className={`activity-category-icon ${transaction.type === "INCOME" ? "income" : "expense"}`} aria-hidden="true">
-                    {transaction.categoryIcon ?? (transaction.type === "INCOME" ? "＋" : "−")}
-                  </span>
-                  <span className="activity-details">
-                    <span className="activity-category">{transaction.categoryName}</span>
-                    <span className="activity-description">
-                      {transaction.description || dateFormatter.format(transaction.occurredAt)}
-                    </span>
-                  </span>
-                  <span className={`activity-amount ${transaction.type === "INCOME" ? "income" : "expense"}`}>
-                    {transaction.type === "INCOME" ? "+" : "−"}{formatKzt(transaction.amount)}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="empty-activity">
-              <div className="empty-orb" aria-hidden="true"><span>₸</span></div>
-              <p>Добавь первую операцию, чтобы увидеть историю и баланс.</p>
-            </div>
-          )}
-        </section>
+          <RecentTransactions />
+        </DashboardTransactionsProvider>
 
         <footer className="dashboard-footer">
           <span>Счёт: {account ? "готов" : "нужно настроить"}</span>

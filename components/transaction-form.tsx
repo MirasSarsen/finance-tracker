@@ -3,7 +3,8 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 
 import { createTransaction } from "@/app/actions/transactions";
-import type { TransactionCategoryOption, TransactionType } from "@/lib/transaction-types";
+import { useDashboardTransactions, type RecentTransaction } from "@/components/dashboard-transactions";
+import type { TransactionActionState, TransactionCategoryOption, TransactionType } from "@/lib/transaction-types";
 
 const initialState = { status: "idle", message: "" } as const;
 
@@ -15,7 +16,13 @@ type TransactionFormProps = {
 
 export function TransactionForm({ categories, accounts, today }: TransactionFormProps) {
   const [type, setType] = useState<TransactionType>("EXPENSE");
-  const [state, formAction, isPending] = useActionState(createTransaction, initialState);
+  const { addOptimisticTransaction } = useDashboardTransactions();
+  const submitTransaction = async (previousState: TransactionActionState, formData: FormData) => {
+    const optimisticTransaction = buildOptimisticTransaction(formData, categories, accounts);
+    if (optimisticTransaction) addOptimisticTransaction(optimisticTransaction);
+    return createTransaction(previousState, formData);
+  };
+  const [state, formAction, isPending] = useActionState(submitTransaction, initialState);
   const formRef = useRef<HTMLFormElement>(null);
   const matchingCategories = categories.filter((category) => category.type === type);
 
@@ -120,4 +127,48 @@ export function TransactionForm({ categories, accounts, today }: TransactionForm
       </button>
     </form>
   );
+}
+
+function buildOptimisticTransaction(
+  formData: FormData,
+  categories: TransactionCategoryOption[],
+  accounts: { id: string; name: string }[],
+): RecentTransaction | null {
+  const type = formData.get("type");
+  const amount = formData.get("amount");
+  const categoryId = formData.get("categoryId");
+  const accountId = formData.get("accountId");
+  const occurredAt = formData.get("occurredAt");
+  const description = formData.get("description");
+
+  if (
+    (type !== "INCOME" && type !== "EXPENSE") ||
+    typeof amount !== "string" ||
+    !/^\d{1,17}(?:\.\d{1,2})?$/.test(amount) ||
+    Number(amount) <= 0 ||
+    typeof categoryId !== "string" ||
+    typeof accountId !== "string" ||
+    typeof occurredAt !== "string" ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(occurredAt) ||
+    typeof description !== "string"
+  ) {
+    return null;
+  }
+
+  const category = categories.find((item) => item.id === categoryId && item.type === type);
+  if (!category || !accounts.some((account) => account.id === accountId)) return null;
+
+  const date = new Date(`${occurredAt}T00:00:00.000Z`);
+  if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== occurredAt) return null;
+
+  return {
+    id: crypto.randomUUID(),
+    type,
+    amount,
+    description: description.trim() || null,
+    occurredAt: date,
+    categoryName: category.name,
+    categoryIcon: category.icon,
+    pending: true,
+  };
 }
