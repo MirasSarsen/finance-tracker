@@ -6,9 +6,10 @@ import { redirect } from "next/navigation";
 import { SignOutButton } from "@/components/sign-out-button";
 import { BottomNavigation } from "@/components/bottom-navigation";
 import { WeeklyAnalytics } from "@/components/weekly-analytics";
+import { WeeklyBudget } from "@/components/weekly-budget";
 import { db } from "@/db";
-import { categories, transactions } from "@/db/schema";
-import { calculateAverageDailySpending, calculatePercentageChange, calculateSafeToSpend, findLargestByAmount } from "@/lib/finance";
+import { categories, transactions, weeklyBudgets } from "@/db/schema";
+import { calculateAverageDailySpending, calculatePercentageChange, calculateSafeToSpend, findLargestByAmount, getLocalWeekStartKey } from "@/lib/finance";
 import { auth } from "@/lib/auth";
 
 const dayMilliseconds = 24 * 60 * 60 * 1000;
@@ -63,6 +64,7 @@ export default async function AnalyticsPage() {
 
   const now = new Date();
   const weekStart = getLocalWeekStart(now);
+  const weekStartKey = getLocalWeekStartKey(now);
   const previousWeekStart = new Date(weekStart.getTime() - 7 * dayMilliseconds);
   const previousPeriodEnd = new Date(now.getTime() - 7 * dayMilliseconds);
   const localDay = sql<string>`to_char(${transactions.occurredAt} at time zone 'Asia/Qyzylorda', 'YYYY-MM-DD')`;
@@ -77,6 +79,7 @@ export default async function AnalyticsPage() {
     [largestExpense],
     [balanceResult],
     [transactionCount],
+    [weeklyBudget],
   ] = await Promise.all([
     db.select({
       income: sql<string>`coalesce(sum(case when ${transactions.type} = 'INCOME' then ${transactions.amount} else 0 end), 0)`,
@@ -127,6 +130,10 @@ export default async function AnalyticsPage() {
       gte(transactions.occurredAt, weekStart),
       lt(transactions.occurredAt, now),
     )),
+    db.select({ amount: weeklyBudgets.amount }).from(weeklyBudgets).where(and(
+      eq(weeklyBudgets.userId, session.user.id),
+      eq(weeklyBudgets.weekStart, weekStartKey),
+    )).limit(1),
   ]);
 
   const expense = weeklyTotals?.expense ?? "0";
@@ -176,6 +183,8 @@ export default async function AnalyticsPage() {
           categoryTotals={categoryTotals}
           weekDays={weekDays}
         />
+
+        <WeeklyBudget budget={weeklyBudget?.amount ?? null} spent={expense} />
 
         <section className="analytics-metrics" aria-label="Ключевые показатели недели">
           <article className="analytics-metric-card">

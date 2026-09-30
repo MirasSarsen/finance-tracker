@@ -1,3 +1,21 @@
+export function getLocalWeekStartKey(date: Date) {
+  const dateParts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Qyzylorda",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const values = Object.fromEntries(dateParts.map(({ type, value }) => [type, value]));
+  const year = Number(values.year);
+  const month = Number(values.month);
+  const day = Number(values.day);
+  const weekday = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+  const mondayOffset = (weekday + 6) % 7;
+  const monday = new Date(Date.UTC(year, month - 1, day - mondayOffset));
+
+  return monday.toISOString().slice(0, 10);
+}
+
 export function calculateAverageDailySpending(expenses: string | number, elapsedDays: number) {
   const amount = Number(expenses);
   if (!Number.isFinite(amount) || amount <= 0 || !Number.isFinite(elapsedDays)) return 0;

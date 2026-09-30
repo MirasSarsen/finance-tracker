@@ -35,3 +35,7 @@ The local PostgreSQL credentials in `docker-compose.yml` are for development onl
 - Average daily spending is current-week expenses divided by the number of elapsed calendar days, with at least one day counted.
 - “Safe to spend” is the non-negative current balance divided by the number of days left in the current week, including today. It does not account for bills or planned expenses.
 - Daily totals, category totals, and insights use only the signed-in user's transactions. When there is no previous-week spending, the app omits the percentage change instead of dividing by zero.
+
+## Weekly budget
+
+Set or update the spending limit from the Analytics page. The app compares it with this week's expenses, shows the remaining amount (or overspend), and keeps a separate budget for each Monday-starting week in the `Asia/Qyzylorda` time zone.

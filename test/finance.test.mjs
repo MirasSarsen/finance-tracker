@@ -6,7 +6,14 @@ import {
   calculatePercentageChange,
   calculateSafeToSpend,
   findLargestByAmount,
+  getLocalWeekStartKey,
 } from "../lib/finance.ts";
+
+test("uses the Monday in the Qyzylorda timezone as the week key", () => {
+  assert.equal(getLocalWeekStartKey(new Date("2026-09-30T12:00:00.000Z")), "2026-09-28");
+  assert.equal(getLocalWeekStartKey(new Date("2026-09-27T19:30:00.000Z")), "2026-09-28");
+  assert.equal(getLocalWeekStartKey(new Date("2026-09-27T18:30:00.000Z")), "2026-09-21");
+});
 
 test("calculates average daily spending for elapsed days", () => {
   assert.equal(calculateAverageDailySpending("126400.00", 7), 126400 / 7);

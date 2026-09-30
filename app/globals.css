@@ -294,6 +294,22 @@ button { cursor: pointer; }
 .analytics-insights-list { display: grid; gap: 12px; margin: 17px 0 0; padding: 0; list-style: none; }
 .analytics-insights-list li { position: relative; padding-left: 18px; color: #58655d; font-size: 12px; line-height: 1.6; }
 .analytics-insights-list li::before { position: absolute; top: 8px; left: 0; width: 6px; height: 6px; border-radius: 50%; background: #72a184; content: ""; }
+.weekly-budget-card { margin-top: 14px; padding: 21px; border: 1px solid #e5ebe5; border-radius: 17px; background: var(--surface); }
+.weekly-budget-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.weekly-budget-heading h2 { margin: 6px 0 0; font-size: 17px; letter-spacing: -.4px; }
+.weekly-budget-total { color: #66736b; font-size: 12px; font-weight: 700; }
+.weekly-budget-progress-block { margin-top: 18px; }
+.weekly-budget-amounts { display: flex; justify-content: space-between; gap: 12px; color: #7b8780; font-size: 11px; }
+.weekly-budget-amounts strong { margin-left: 4px; color: var(--ink); font-size: 12px; }
+.weekly-budget-amounts .weekly-budget-over,
+.weekly-budget-amounts .weekly-budget-over strong { color: #ad6048; }
+.weekly-budget-track { height: 9px; overflow: hidden; margin-top: 10px; border-radius: 99px; background: #edf2ed; }
+.weekly-budget-track > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #73b789, #1b6b4b); transition: width 180ms ease; }
+.weekly-budget-track.over > span { background: linear-gradient(90deg, #d89b85, #ad6048); }
+.weekly-budget-caption { margin: 9px 0 0; color: #87928a; font-size: 11px; line-height: 1.5; }
+.weekly-budget-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 11px; margin-top: 18px; }
+.weekly-budget-submit { min-height: 49px; border-color: #d6e4d9; color: var(--green-dark); }
+.weekly-budget-submit:hover:not(:disabled) { background: #f1f6f1; }
 
 .activity-card { margin-top: 15px; padding: 22px 24px 5px; border: 1px solid #e5ebe5; border-radius: 18px; background: var(--surface); }
 .section-heading { display: flex; align-items: center; justify-content: space-between; }
@@ -413,6 +429,10 @@ button { cursor: pointer; }
   .analytics-metric-card { padding: 15px; }
   .analytics-metric-value { font-size: 18px; }
   .analytics-insights-card { margin-top: 10px; padding: 18px; }
+  .weekly-budget-card { margin-top: 10px; padding: 17px; }
+  .weekly-budget-heading { align-items: flex-start; flex-direction: column; gap: 7px; }
+  .weekly-budget-form { grid-template-columns: 1fr; gap: 10px; margin-top: 14px; }
+  .weekly-budget-submit { width: 100%; }
   .analytics-card { padding: 17px; }
   .weekly-chart { gap: 5px; }
   .weekly-chart-amount { font-size: 8px; }
@@ -507,6 +527,7 @@ button { cursor: pointer; }
 :root[data-theme="dark"] .bottom-navigation-item:hover,
 :root[data-theme="dark"] .bottom-navigation-item.active { background: #2a3b30; }
 :root[data-theme="dark"] .theme-settings-card,
+:root[data-theme="dark"] .weekly-budget-card,
 :root[data-theme="dark"] .summary-card,
 :root[data-theme="dark"] .analytics-card,
 :root[data-theme="dark"] .analytics-metric-card,
@@ -521,6 +542,8 @@ button { cursor: pointer; }
 :root[data-theme="dark"] .weekly-chart-track,
 :root[data-theme="dark"] .category-expense-track,
 :root[data-theme="dark"] .activity-category-icon { background: #27332c; }
+:root[data-theme="dark"] .weekly-budget-track { background: #303c34; }
+:root[data-theme="dark"] .weekly-budget-submit:hover:not(:disabled) { background: #27332c; }
 :root[data-theme="dark"] .activity-category-icon.income,
 :root[data-theme="dark"] .summary-icon.income-icon { background: #244333; color: #a5d9b7; }
 :root[data-theme="dark"] .activity-category-icon.expense,
@@ -531,8 +554,13 @@ button { cursor: pointer; }
 :root[data-theme="dark"] .transaction-type-button.active.income,
 :root[data-theme="dark"] .analytics-type-switch button.active.income { color: #88d3a3; }
 :root[data-theme="dark"] .category-expense-amount,
+:root[data-theme="dark"] .weekly-budget-total,
+:root[data-theme="dark"] .weekly-budget-amounts,
+:root[data-theme="dark"] .weekly-budget-caption,
 :root[data-theme="dark"] .analytics-insights-list li,
 :root[data-theme="dark"] .delete-transaction-card > p { color: #d1ddd4; }
+:root[data-theme="dark"] .weekly-budget-amounts .weekly-budget-over,
+:root[data-theme="dark"] .weekly-budget-amounts .weekly-budget-over strong { color: #e5a18b; }
 :root[data-theme="dark"] .activity-amount.income,
 :root[data-theme="dark"] .income-change { color: #88d3a3; }
 :root[data-theme="dark"] .activity-amount.expense,

@@ -1,6 +1,9 @@
+import { sql } from "drizzle-orm";
 import {
   index,
   boolean,
+  check,
+  date,
   numeric,
   pgEnum,
   pgTable,
@@ -176,5 +179,22 @@ export const transactions = pgTable(
     ),
     index("transactions_account_id_idx").on(table.accountId),
     index("transactions_category_id_idx").on(table.categoryId),
+  ],
+);
+
+export const weeklyBudgets = pgTable(
+  "weekly_budgets",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    weekStart: date("week_start", { mode: "string" }).notNull(),
+    amount: numeric("amount", { precision: 19, scale: 2 }).notNull(),
+    ...timestamps(),
+  },
+  (table) => [
+    uniqueIndex("weekly_budgets_user_week_unique").on(table.userId, table.weekStart),
+    check("weekly_budgets_amount_positive", sql`${table.amount} > 0`),
   ],
 );

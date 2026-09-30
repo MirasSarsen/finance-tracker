@@ -15,6 +15,13 @@
       "when": 1790413476173,
       "tag": "0001_worthless_thunderbolts",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790787675874,
+      "tag": "0002_weekly_budget",
+      "breakpoints": true
     }
   ]
 }
