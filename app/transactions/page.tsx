@@ -4,6 +4,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { SignOutButton } from "@/components/sign-out-button";
+import { BottomNavigation } from "@/components/bottom-navigation";
 import { db } from "@/db";
 import { accounts, categories, transactions } from "@/db/schema";
 import { auth } from "@/lib/auth";
@@ -146,6 +147,7 @@ export default async function TransactionsPage() {
           </section>
         )}
       </div>
+      <BottomNavigation />
     </main>
   );
 }

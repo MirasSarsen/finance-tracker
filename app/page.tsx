@@ -4,6 +4,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { SignOutButton } from "@/components/sign-out-button";
+import { BottomNavigation } from "@/components/bottom-navigation";
 import { TransactionForm } from "@/components/transaction-form";
 import { WeeklyAnalytics } from "@/components/weekly-analytics";
 import { db } from "@/db";
@@ -203,7 +204,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="transaction-section" aria-label="Добавить операцию">
+        <section className="transaction-section" id="transaction-form" aria-label="Добавить операцию">
           <TransactionForm categories={userCategories} accounts={userAccounts} today={getLocalDateKey(now)} />
         </section>
 
@@ -260,6 +261,7 @@ export default async function Home() {
           <span>{expenseCategoryCount} категорий расходов · {incomeCategoryCount} категорий доходов</span>
         </footer>
       </div>
+      <BottomNavigation />
     </main>
   );
 }

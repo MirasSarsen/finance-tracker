@@ -4,6 +4,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { SignOutButton } from "@/components/sign-out-button";
+import { BottomNavigation } from "@/components/bottom-navigation";
 import { WeeklyAnalytics } from "@/components/weekly-analytics";
 import { db } from "@/db";
 import { categories, transactions } from "@/db/schema";
@@ -221,6 +222,7 @@ export default async function AnalyticsPage() {
           )}
         </section>
       </div>
+      <BottomNavigation />
     </main>
   );
 }

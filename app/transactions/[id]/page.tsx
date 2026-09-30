@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
 import { DeleteTransactionControl } from "@/components/delete-transaction-control";
+import { BottomNavigation } from "@/components/bottom-navigation";
 import { SignOutButton } from "@/components/sign-out-button";
 import { TransactionEditForm } from "@/components/transaction-edit-form";
 import { db } from "@/db";
@@ -99,6 +100,7 @@ export default async function TransactionDetailsPage({ params }: { params: Promi
           </section>
         </div>
       </div>
+      <BottomNavigation />
     </main>
   );
 }
