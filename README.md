@@ -11,6 +11,8 @@ A mobile-first personal finance tracker built with Next.js, TypeScript, PostgreS
 5. Apply migrations with `npm run db:migrate`.
 6. Start the app with `npm run dev`.
 
+Run the financial calculation tests with `npm test` and check code style with `npm run lint`.
+
 The local PostgreSQL credentials in `docker-compose.yml` are for development only. Keep `.env` out of version control.
 
 ## Database scripts

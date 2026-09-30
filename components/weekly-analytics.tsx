@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 
+import { calculatePercentageChange } from "@/lib/finance";
 import type { TransactionType } from "@/lib/transaction-types";
 
 type DailyTotal = { type: TransactionType; day: string; amount: string };
@@ -30,10 +31,11 @@ function formatKzt(amount: string | number) {
 function getChangeLabel(current: string, previous: string) {
   const currentAmount = Number(current);
   const previousAmount = Number(previous);
-  if (previousAmount === 0) return currentAmount === 0 ? "Без изменений к прошлому периоду" : "В прошлом периоде операций не было";
+  const change = calculatePercentageChange(currentAmount, previousAmount);
+  if (change === null) return currentAmount === 0 ? "Без изменений к прошлому периоду" : "В прошлом периоде операций не было";
 
-  const change = Math.round(((currentAmount - previousAmount) / previousAmount) * 100);
-  return `${change > 0 ? "+" : ""}${change}% к прошлому периоду`;
+  const formattedChange = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1 }).format(change);
+  return `${change > 0 ? "+" : ""}${formattedChange}% к прошлому периоду`;
 }
 
 export function WeeklyAnalytics({ income, expense, previousIncome, previousExpense, dailyTotals, categoryTotals, weekDays }: Props) {

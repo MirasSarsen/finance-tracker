@@ -8,6 +8,7 @@ import { BottomNavigation } from "@/components/bottom-navigation";
 import { WeeklyAnalytics } from "@/components/weekly-analytics";
 import { db } from "@/db";
 import { categories, transactions } from "@/db/schema";
+import { calculateAverageDailySpending, calculatePercentageChange, calculateSafeToSpend, findLargestByAmount } from "@/lib/finance";
 import { auth } from "@/lib/auth";
 
 const dayMilliseconds = 24 * 60 * 60 * 1000;
@@ -132,16 +133,15 @@ export default async function AnalyticsPage() {
   const previousExpense = previousTotals?.expense ?? "0";
   const elapsedDays = Math.max(1, Math.min(7, Math.ceil((now.getTime() - weekStart.getTime()) / dayMilliseconds)));
   const daysLeftIncludingToday = 7 - elapsedDays + 1;
-  const positiveBalance = Math.max(0, Number(balanceResult?.amount ?? "0"));
-  const safeToSpend = daysLeftIncludingToday > 0 ? positiveBalance / daysLeftIncludingToday : 0;
+  const currentBalance = Number(balanceResult?.amount ?? "0");
+  const positiveBalance = Math.max(0, currentBalance);
+  const safeToSpend = calculateSafeToSpend(currentBalance, daysLeftIncludingToday);
   const expenseByDay = new Map(dailyTotals
     .filter((item) => item.type === "EXPENSE")
     .map((item) => [item.day, Number(item.amount)]));
-  const highestExpenseDay = [...expenseByDay.entries()].sort((first, second) => second[1] - first[1])[0];
+  const highestExpenseDay = findLargestByAmount([...expenseByDay.entries()].map(([day, amount]) => ({ day, amount })));
   const highestCategory = categoryTotals.find((item) => item.type === "EXPENSE");
-  const spendingChange = Number(previousExpense) > 0
-    ? Math.round(((Number(expense) - Number(previousExpense)) / Number(previousExpense)) * 100)
-    : null;
+  const spendingChange = calculatePercentageChange(expense, previousExpense);
   const weekDays = getWeekDays(weekStart);
   const safeToSpendCaption = Number(balanceResult?.amount ?? "0") <= 0
     ? "Баланс не положительный"
@@ -180,7 +180,7 @@ export default async function AnalyticsPage() {
         <section className="analytics-metrics" aria-label="Ключевые показатели недели">
           <article className="analytics-metric-card">
             <p className="summary-label">Средний расход в день</p>
-            <p className="analytics-metric-value">{formatKzt(Number(expense) / elapsedDays)}</p>
+            <p className="analytics-metric-value">{formatKzt(calculateAverageDailySpending(expense, elapsedDays))}</p>
             <p className="summary-caption">{elapsedDays} {elapsedDays === 1 ? "день" : "дней"} текущей недели</p>
           </article>
           <article className="analytics-metric-card">
@@ -211,11 +211,11 @@ export default async function AnalyticsPage() {
                 <li>
                   {spendingChange === 0
                     ? "Расходы пока на том же уровне, что и в аналогичный период прошлой недели."
-                    : `Расходы ${spendingChange > 0 ? "выросли" : "снизились"} на ${Math.abs(spendingChange)}% относительно аналогичного периода прошлой недели.`}
+                    : `Расходы ${spendingChange > 0 ? "выросли" : "снизились"} на ${new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 1 }).format(Math.abs(spendingChange))}% относительно аналогичного периода прошлой недели.`}
                 </li>
               )}
               {highestCategory ? <li>Больше всего потрачено на категорию «{highestCategory.name}» — {formatKzt(highestCategory.amount)}.</li> : null}
-              {highestExpenseDay ? <li>Самый дорогой день — {formatDay(highestExpenseDay[0])}: {formatKzt(highestExpenseDay[1])}.</li> : null}
+              {highestExpenseDay ? <li>Самый дорогой день — {formatDay(highestExpenseDay.day)}: {formatKzt(highestExpenseDay.amount)}.</li> : null}
             </ul>
           ) : (
             <p className="analytics-empty">Добавь операции за эту неделю — здесь появятся выводы на основе твоих данных.</p>
