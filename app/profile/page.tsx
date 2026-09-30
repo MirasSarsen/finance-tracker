@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { BottomNavigation } from "@/components/bottom-navigation";
 import { SignOutButton } from "@/components/sign-out-button";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { db } from "@/db";
 import { accounts, categories, transactions } from "@/db/schema";
 import { auth } from "@/lib/auth";
@@ -47,6 +48,8 @@ export default async function ProfilePage() {
             <p>{session.user.email}</p>
           </div>
         </section>
+
+        <ThemeToggle />
 
         <section className="profile-stats-grid" aria-label="Сводка профиля">
           <article className="summary-card">
