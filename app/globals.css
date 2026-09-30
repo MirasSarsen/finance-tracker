@@ -359,11 +359,12 @@ button { cursor: pointer; }
 .error-page { display: flex; flex-direction: column; }
 .error-card { display: grid; justify-items: center; width: min(100%, 480px); margin: auto; padding: 36px 26px; border: 1px solid #e5ebe5; border-radius: 20px; background: var(--surface); text-align: center; }
 .error-icon { display: grid; width: 48px; height: 48px; place-items: center; border-radius: 16px; background: #f7e8e2; color: #ad6048; font-size: 23px; font-weight: 750; }
+.not-found-icon { width: 64px; font-size: 16px; }
 .error-card .eyebrow { margin-top: 23px; }
 .error-card h1 { max-width: 340px; margin: 9px 0 0; font-size: clamp(24px, 5vw, 30px); letter-spacing: -1px; }
 .error-copy { max-width: 330px; margin: 11px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
 .error-reference { margin: 12px 0 0; color: #89958d; font-size: 10px; }
-.error-retry { min-width: 190px; margin-top: 23px; padding: 0 20px; }
+.error-retry { min-width: 190px; margin-top: 23px; padding: 0 20px; text-decoration: none; }
 .profile-accounts-card { margin-top: 12px; padding: 20px 22px 5px; border: 1px solid #e5ebe5; border-radius: 17px; background: var(--surface); }
 .profile-accounts-card .section-heading h2 { margin: 6px 0 0; font-size: 16px; }
 .profile-account-list { margin: 13px 0 0; padding: 0; list-style: none; }
