@@ -179,6 +179,26 @@ button { cursor: pointer; }
 
 .dashboard-page { min-height: 100svh; padding: 0 22px 120px; }
 .dashboard-shell { width: min(100%, 940px); margin: 0 auto; }
+.loading-content { display: grid; gap: 13px; padding-top: 41px; }
+.loading-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
+.loading-skeleton { position: relative; display: block; overflow: hidden; border-radius: 12px; background: #e8ede8; }
+.loading-skeleton::after { position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, #ffffffa8, transparent); animation: loading-shimmer 1.5s infinite; content: ""; }
+.loading-avatar { width: 36px; height: 36px; border-radius: 50%; }
+.loading-title { width: min(310px, 72%); height: 32px; margin-top: 12px; border-radius: 9px; }
+.loading-subtitle { width: min(230px, 54%); height: 14px; margin-bottom: 8px; }
+.loading-balance { display: grid; min-height: 176px; align-content: start; gap: 17px; padding: 25px 27px; border-radius: 20px; background: #dce8df; }
+.loading-balance span, .loading-panel span { display: block; height: 12px; border-radius: 8px; background: #cbd9ce; }
+.loading-balance span:first-child { width: 100px; }
+.loading-balance span:nth-child(2) { width: min(240px, 70%); height: 43px; }
+.loading-balance span:last-child { width: 72%; margin-top: 10px; }
+.loading-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+.loading-cards span { height: 112px; border: 1px solid #e5ebe5; border-radius: 17px; background: #fff; }
+.loading-panel { display: grid; gap: 15px; min-height: 190px; padding: 22px; border: 1px solid #e5ebe5; border-radius: 18px; background: #fff; }
+.loading-panel span:first-child { width: 35%; height: 17px; }
+.loading-panel span:nth-child(2) { width: 100%; height: 80px; }
+.loading-panel span:last-child { width: 62%; height: 12px; }
+@keyframes loading-shimmer { 100% { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) { .loading-skeleton::after { animation: none; } }
 .dashboard-header { display: flex; min-height: 82px; align-items: center; justify-content: space-between; border-bottom: 1px solid #e3e9e3; }
 .dashboard-brand { text-decoration: none; }
 .profile-chip { display: flex; align-items: center; gap: 10px; }
@@ -354,6 +374,9 @@ button { cursor: pointer; }
 
 @media (max-width: 520px) {
   .dashboard-page { padding: 0 16px 112px; }
+  .loading-content { gap: 10px; padding-top: 32px; }
+  .loading-balance { min-height: 158px; padding: 21px 20px 16px; border-radius: 17px; }
+  .loading-cards { gap: 10px; }
   .dashboard-header { min-height: 70px; }
   .profile-name { display: none; }
   .sign-out-button { margin-left: 1px; }
