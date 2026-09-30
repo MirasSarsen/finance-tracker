@@ -13,6 +13,13 @@ import { auth } from "@/lib/auth";
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const amountPattern = /^\d{1,17}(?:\.\d{1,2})?$/;
 
+function parseTransactionDate(value: FormDataEntryValue | null) {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const date = new Date(`${value}T00:00:00.000Z`);
+  if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value) return null;
+  return date;
+}
+
 export async function createTransaction(
   _previousState: TransactionActionState,
   formData: FormData,
@@ -26,7 +33,9 @@ export async function createTransaction(
   const rawType = formData.get("type");
   const amount = formData.get("amount");
   const categoryId = formData.get("categoryId");
+  const accountId = formData.get("accountId");
   const rawDescription = formData.get("description");
+  const occurredAt = parseTransactionDate(formData.get("occurredAt"));
 
   if (rawType !== "INCOME" && rawType !== "EXPENSE") {
     return { status: "error", message: "Выбери доход или расход." };
@@ -44,6 +53,14 @@ export async function createTransaction(
     return { status: "error", message: "Выбери категорию." };
   }
 
+  if (typeof accountId !== "string" || !uuidPattern.test(accountId)) {
+    return { status: "error", message: "Выбери счёт." };
+  }
+
+  if (!occurredAt) {
+    return { status: "error", message: "Выбери корректную дату." };
+  }
+
   if (typeof rawDescription !== "string") {
     return { status: "error", message: "Проверь описание операции." };
   }
@@ -57,7 +74,7 @@ export async function createTransaction(
   const [account] = await db
     .select({ id: accounts.id })
     .from(accounts)
-    .where(eq(accounts.userId, session.user.id))
+    .where(and(eq(accounts.id, accountId), eq(accounts.userId, session.user.id)))
     .limit(1);
 
   if (!account) {
@@ -87,9 +104,12 @@ export async function createTransaction(
     type,
     amount,
     description: description || null,
+    occurredAt,
   });
 
   revalidatePath("/");
+  revalidatePath("/analytics");
+  revalidatePath("/transactions");
 
   return { status: "success", message: "Операция добавлена." };
 }
@@ -107,7 +127,7 @@ export async function updateTransaction(
   const categoryId = formData.get("categoryId");
   const accountId = formData.get("accountId");
   const rawDescription = formData.get("description");
-  const rawDate = formData.get("occurredAt");
+  const occurredAt = parseTransactionDate(formData.get("occurredAt"));
 
   if (typeof id !== "string" || !uuidPattern.test(id)) {
     return { status: "error", message: "Не удалось найти операцию." };
@@ -127,11 +147,7 @@ export async function updateTransaction(
   if (typeof rawDescription !== "string" || rawDescription.trim().length > 300) {
     return { status: "error", message: "Описание должно быть короче 300 символов." };
   }
-  if (typeof rawDate !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(rawDate)) {
-    return { status: "error", message: "Выбери корректную дату." };
-  }
-  const occurredAt = new Date(`${rawDate}T00:00:00.000Z`);
-  if (Number.isNaN(occurredAt.getTime()) || occurredAt.toISOString().slice(0, 10) !== rawDate) {
+  if (!occurredAt) {
     return { status: "error", message: "Выбери корректную дату." };
   }
 
@@ -168,6 +184,7 @@ export async function updateTransaction(
   }).where(and(eq(transactions.id, id), eq(transactions.userId, session.user.id)));
 
   revalidatePath("/");
+  revalidatePath("/analytics");
   revalidatePath("/transactions");
   revalidatePath(`/transactions/${id}`);
   return { status: "success", message: "Изменения сохранены." };
@@ -191,6 +208,7 @@ export async function deleteTransaction(
   if (!deleted) return { status: "error", message: "Операция не найдена." };
 
   revalidatePath("/");
+  revalidatePath("/analytics");
   revalidatePath("/transactions");
   redirect("/transactions");
 }

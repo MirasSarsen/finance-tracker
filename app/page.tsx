@@ -49,6 +49,14 @@ function getWeekDays(weekStart: Date) {
   });
 }
 
+function getLocalDateKey(date: Date) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Qyzylorda", year: "numeric", month: "2-digit", day: "2-digit",
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
 export default async function Home() {
   const session = await auth.api.getSession({ headers: await headers() });
 
@@ -66,7 +74,7 @@ export default async function Home() {
   const categoryExpenseTotal = sql<string>`coalesce(sum(${transactions.amount}), 0)`;
 
   const [
-    [account],
+    userAccounts,
     userCategories,
     [balanceResult],
     [weeklyTotals],
@@ -80,7 +88,7 @@ export default async function Home() {
       .select({ id: accounts.id, name: accounts.name, currency: accounts.currency })
       .from(accounts)
       .where(eq(accounts.userId, userId))
-      .limit(1),
+      .orderBy(accounts.createdAt),
     db
       .select({ id: categories.id, name: categories.name, type: categories.type, icon: categories.icon })
       .from(categories)
@@ -143,6 +151,7 @@ export default async function Home() {
     db.select({ total: count() }).from(transactions).where(eq(transactions.userId, userId)),
   ]);
 
+  const account = userAccounts[0];
   const expenseCategoryCount = userCategories.filter((item) => item.type === "EXPENSE").length;
   const incomeCategoryCount = userCategories.filter((item) => item.type === "INCOME").length;
   const balance = balanceResult?.amount ?? "0";
@@ -195,7 +204,7 @@ export default async function Home() {
         </section>
 
         <section className="transaction-section" aria-label="Добавить операцию">
-          <TransactionForm categories={userCategories} />
+          <TransactionForm categories={userCategories} accounts={userAccounts} today={getLocalDateKey(now)} />
         </section>
 
         <WeeklyAnalytics

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 import type { TransactionType } from "@/lib/transaction-types";
 
@@ -54,6 +55,7 @@ export function WeeklyAnalytics({ income, expense, previousIncome, previousExpen
           <p className="eyebrow">ОБЗОР НЕДЕЛИ</p>
           <h2>Доходы и расходы</h2>
         </div>
+        <Link className="analytics-details-link" href="/analytics">Подробная аналитика →</Link>
         <div className="analytics-type-switch" aria-label="Тип операций для аналитики">
           <button aria-pressed={type === "EXPENSE"} className={type === "EXPENSE" ? "active expense" : ""} onClick={() => setType("EXPENSE")} type="button">Расходы</button>
           <button aria-pressed={type === "INCOME"} className={type === "INCOME" ? "active income" : ""} onClick={() => setType("INCOME")} type="button">Доходы</button>

@@ -210,6 +210,10 @@ button { cursor: pointer; }
 .transaction-field { display: grid; gap: 8px; color: #445149; font-size: 12px; font-weight: 650; }
 .transaction-field input, .transaction-field select, .transaction-field textarea { width: 100%; min-height: 49px; padding: 12px 14px; border: 1px solid #dfe6df; border-radius: 12px; outline: none; background: var(--surface); color: var(--ink); font: inherit; font-size: 14px; }
 .transaction-field textarea { min-height: 82px; resize: vertical; }
+.transaction-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.transaction-amount-field { gap: 10px; }
+.transaction-field input.transaction-amount-input { min-height: 82px; padding: 10px 16px; border-color: #dce8de; border-radius: 15px; background: #f8fbf8; color: var(--green-dark); font-size: clamp(30px, 7vw, 42px); font-weight: 700; letter-spacing: -1.6px; }
+.transaction-field input.transaction-amount-input:focus { border-color: #67a284; }
 .transaction-field input:focus, .transaction-field select:focus, .transaction-field textarea:focus { border-color: #67a284; box-shadow: 0 0 0 3px #37815c1a; }
 .optional-label { color: #8a958e; font-size: 11px; font-weight: 450; }
 .transaction-message { margin: 0; font-size: 12px; line-height: 1.5; }
@@ -257,6 +261,17 @@ button { cursor: pointer; }
 .category-expense-track > span { display: block; height: 100%; border-radius: inherit; background: #78a987; }
 .category-expense-track > span.expense { background: #d89b85; }
 .analytics-empty { margin: 24px 0; color: #8a958e; font-size: 12px; }
+.analytics-details-link { color: var(--green); font-size: 11px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.analytics-details-link:hover { text-decoration: underline; }
+.analytics-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+.analytics-metric-card { min-width: 0; padding: 19px; border: 1px solid #e5ebe5; border-radius: 16px; background: var(--surface); }
+.analytics-metric-value { overflow-wrap: anywhere; margin: 9px 0 0; font-size: clamp(19px, 3vw, 25px); font-weight: 700; letter-spacing: -.6px; }
+.analytics-metric-card .summary-caption { line-height: 1.5; }
+.analytics-insights-card { margin-top: 14px; padding: 21px; border: 1px solid #e5ebe5; border-radius: 17px; background: var(--surface); }
+.analytics-insights-card h2 { margin: 7px 0 0; font-size: 17px; letter-spacing: -.4px; }
+.analytics-insights-list { display: grid; gap: 12px; margin: 17px 0 0; padding: 0; list-style: none; }
+.analytics-insights-list li { position: relative; padding-left: 18px; color: #58655d; font-size: 12px; line-height: 1.6; }
+.analytics-insights-list li::before { position: absolute; top: 8px; left: 0; width: 6px; height: 6px; border-radius: 50%; background: #72a184; content: ""; }
 
 .activity-card { margin-top: 15px; padding: 22px 24px 5px; border: 1px solid #e5ebe5; border-radius: 18px; background: var(--surface); }
 .section-heading { display: flex; align-items: center; justify-content: space-between; }
@@ -324,17 +339,23 @@ button { cursor: pointer; }
   .balance-card { padding: 21px 20px 16px; border-radius: 17px; }
   .dashboard-grid { gap: 10px; margin-top: 10px; }
   .analytics-section { margin-top: 10px; }
+  .analytics-details-link { white-space: normal; }
   .analytics-heading { align-items: flex-start; flex-direction: column; gap: 7px; }
   .analytics-type-switch { width: 100%; }
   .analytics-summary { grid-template-columns: 1fr; }
   .analytics-period-note { padding: 0 3px 2px; }
   .analytics-grid { grid-template-columns: 1fr; gap: 10px; }
+  .analytics-metrics { grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 10px; }
+  .analytics-metric-card { padding: 15px; }
+  .analytics-metric-value { font-size: 18px; }
+  .analytics-insights-card { margin-top: 10px; padding: 18px; }
   .analytics-card { padding: 17px; }
   .weekly-chart { gap: 5px; }
   .weekly-chart-amount { font-size: 8px; }
   .summary-card { padding: 14px; }
   .summary-value { font-size: 19px; }
   .transaction-form { gap: 14px; padding: 18px; }
+  .transaction-form-row { grid-template-columns: 1fr; gap: 14px; }
   .activity-card { margin-top: 10px; padding: 19px 17px 4px; }
   .activity-actions { align-items: flex-end; flex-direction: column; gap: 5px; }
   .history-day { padding: 16px 16px 3px; }

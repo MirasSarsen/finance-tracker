@@ -9,9 +9,11 @@ const initialState = { status: "idle", message: "" } as const;
 
 type TransactionFormProps = {
   categories: TransactionCategoryOption[];
+  accounts: { id: string; name: string }[];
+  today: string;
 };
 
-export function TransactionForm({ categories }: TransactionFormProps) {
+export function TransactionForm({ categories, accounts, today }: TransactionFormProps) {
   const [type, setType] = useState<TransactionType>("EXPENSE");
   const [state, formAction, isPending] = useActionState(createTransaction, initialState);
   const formRef = useRef<HTMLFormElement>(null);
@@ -40,7 +42,7 @@ export function TransactionForm({ categories }: TransactionFormProps) {
           onClick={() => setType("EXPENSE")}
           type="button"
         >
-          Расход
+          − Расход
         </button>
         <button
           aria-pressed={type === "INCOME"}
@@ -48,13 +50,13 @@ export function TransactionForm({ categories }: TransactionFormProps) {
           onClick={() => setType("INCOME")}
           type="button"
         >
-          Доход
+          ＋ Доход
         </button>
       </div>
 
       <input name="type" type="hidden" value={type} />
 
-      <label className="transaction-field">
+      <label className="transaction-field transaction-amount-field">
         Сумма, ₸
         <input
           autoComplete="off"
@@ -62,6 +64,7 @@ export function TransactionForm({ categories }: TransactionFormProps) {
           max="99999999999999999.99"
           min="0.01"
           name="amount"
+          className="transaction-amount-input"
           placeholder="0.00"
           required
           step="0.01"
@@ -81,6 +84,21 @@ export function TransactionForm({ categories }: TransactionFormProps) {
         </select>
       </label>
 
+      <div className="transaction-form-row">
+        <label className="transaction-field">
+          Дата
+          <input defaultValue={today} name="occurredAt" required type="date" />
+        </label>
+        <label className="transaction-field">
+          Счёт
+          <select defaultValue={accounts[0]?.id ?? ""} name="accountId" required>
+            {accounts.map((account) => (
+              <option key={account.id} value={account.id}>{account.name}</option>
+            ))}
+          </select>
+        </label>
+      </div>
+
       <label className="transaction-field">
         Описание <span className="optional-label">необязательно</span>
         <textarea
@@ -97,7 +115,7 @@ export function TransactionForm({ categories }: TransactionFormProps) {
         </p>
       ) : null}
 
-      <button className="primary-button transaction-submit" disabled={isPending || matchingCategories.length === 0} type="submit">
+      <button className="primary-button transaction-submit" disabled={isPending || matchingCategories.length === 0 || accounts.length === 0} type="submit">
         {isPending ? "Сохраняю…" : "Добавить операцию"}
       </button>
     </form>
