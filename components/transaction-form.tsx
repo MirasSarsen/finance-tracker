@@ -35,7 +35,7 @@ export function TransactionForm({ categories, accounts, today }: TransactionForm
         <span className="transaction-form-mark" aria-hidden="true">＋</span>
       </div>
 
-      <div className="transaction-type-switch" aria-label="Тип операции">
+      <div className="transaction-type-switch" role="group" aria-label="Тип операции">
         <button
           aria-pressed={type === "EXPENSE"}
           className={`transaction-type-button${type === "EXPENSE" ? " active expense" : ""}`}

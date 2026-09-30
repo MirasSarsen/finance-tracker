@@ -33,7 +33,7 @@ export function TransactionEditForm({ transaction, categories, accounts }: Props
       <input name="transactionId" type="hidden" value={transaction.id} />
       <input name="type" type="hidden" value={type} />
 
-      <div className="transaction-type-switch" aria-label="Тип операции">
+      <div className="transaction-type-switch" role="group" aria-label="Тип операции">
         <button type="button" aria-pressed={type === "EXPENSE"} className={`transaction-type-button${type === "EXPENSE" ? " active expense" : ""}`} onClick={() => setType("EXPENSE")}>Расход</button>
         <button type="button" aria-pressed={type === "INCOME"} className={`transaction-type-button${type === "INCOME" ? " active income" : ""}`} onClick={() => setType("INCOME")}>Доход</button>
       </div>

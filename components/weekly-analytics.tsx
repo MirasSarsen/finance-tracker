@@ -58,7 +58,7 @@ export function WeeklyAnalytics({ income, expense, previousIncome, previousExpen
           <h2>Доходы и расходы</h2>
         </div>
         <Link className="analytics-details-link" href="/analytics">Подробная аналитика →</Link>
-        <div className="analytics-type-switch" aria-label="Тип операций для аналитики">
+        <div className="analytics-type-switch" role="group" aria-label="Тип операций для аналитики">
           <button aria-pressed={type === "EXPENSE"} className={type === "EXPENSE" ? "active expense" : ""} onClick={() => setType("EXPENSE")} type="button">Расходы</button>
           <button aria-pressed={type === "INCOME"} className={type === "INCOME" ? "active income" : ""} onClick={() => setType("INCOME")} type="button">Доходы</button>
         </div>
@@ -81,7 +81,7 @@ export function WeeklyAnalytics({ income, expense, previousIncome, previousExpen
             <div><p className="eyebrow">ПО ДНЯМ</p><h3 id="daily-expenses-heading">{selectedLabel} за неделю</h3></div>
             <span>{formatKzt(chartValues.reduce((total, item) => total + item.amount, 0))}</span>
           </div>
-          <div className="weekly-chart" role="img" aria-label="График расходов по дням текущей недели">
+          <div className="weekly-chart" role="img" aria-label={`График ${type === "INCOME" ? "доходов" : "расходов"} по дням текущей недели`}>
             {chartValues.map(({ key, label, amount }) => (
               <div className="weekly-chart-day" key={key}>
                 <span className="weekly-chart-amount">{amount > 0 ? formatKzt(amount) : "—"}</span>
